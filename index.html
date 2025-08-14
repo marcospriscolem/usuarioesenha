@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo da Forca</title>
+    <title>Faixas Dançantes</title>
     <style>
         * {
             margin: 0;
@@ -12,584 +12,216 @@
         }
 
         body {
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            overflow: hidden;
             font-family: 'Arial', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: #333;
         }
 
-        .game-container {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            max-width: 1200px;
-            width: 95%;
-            display: grid;
-            grid-template-columns: 1fr 200px;
-            gap: 20px;
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
         }
 
-        .left-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .game-header {
-            text-align: center;
-        }
-
-        .game-title {
-            font-size: 2rem;
-            color: #667eea;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .word-display {
-            font-size: 2.5rem;
-            font-weight: bold;
-            letter-spacing: 12px;
-            text-align: center;
-            margin: 20px 0;
-            color: #333;
-            min-height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .hint {
-            text-align: center;
-            font-size: 1.1rem;
-            color: #666;
-            margin-bottom: 10px;
-            font-style: italic;
-        }
-
-        .keyboard {
-            display: grid;
-            grid-template-columns: repeat(13, 1fr);
-            gap: 8px;
-            margin: 15px 0;
-            transition: all 0.3s ease;
-        }
-
-        .key {
-            background: #f0f0f0;
-            border: 2px solid #ddd;
-            border-radius: 6px;
-            padding: 10px 5px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            min-height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .key:hover:not(.used):not(.correct) {
-            background: #e0e0e0;
-            transform: translateY(-2px);
-        }
-
-        .key.used {
-            background: #ff6b6b;
-            color: white;
-            cursor: not-allowed;
-        }
-
-        .key.correct {
-            background: #51cf66;
-            color: white;
-            cursor: not-allowed;
-        }
-
-        .hangman {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 300px;
-        }
-
-        .hangman svg {
-            width: 180px;
-            height: 250px;
-        }
-
-        .game-info {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .errors {
-            font-size: 1.3rem;
-            color: #ff6b6b;
-            font-weight: bold;
-        }
-
-        .message {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin: 20px 0;
-            min-height: 40px;
-        }
-
-        .win {
-            color: #51cf66;
-        }
-
-        .lose {
-            color: #ff6b6b;
-        }
-
-        .penalty {
-            color: #ff9500;
-        }
-
-        .timer {
-            font-size: 1.2rem;
-            color: #ff9500;
-            text-align: center;
-            margin: 10px 0;
-            font-weight: bold;
-            background: rgba(255, 149, 0, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            border: 2px solid rgba(255, 149, 0, 0.3);
-        }
-
-        .welcome-screen {
-            background: linear-gradient(145deg, #fff 0%, #f8f9ff 100%);
-            border-radius: 25px;
-            padding: 60px;
-            box-shadow: 0 25px 50px rgba(102, 126, 234, 0.15);
-            text-align: center;
-            max-width: 550px;
-            width: 90%;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-        }
-
-        .welcome-content {
-            display: flex;
-            flex-direction: column;
-            gap: 35px;
-            align-items: center;
-        }
-
-        .welcome-title {
-            font-size: 2.8rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            font-weight: 600;
-            margin: 0;
-            line-height: 1.2;
-        }
-
-        .welcome-subtitle {
-            font-size: 1.2rem;
-            color: #6b7280;
-            margin: -10px 0 10px 0;
-            font-weight: 400;
-        }
-
-        .welcome-emoji {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-
-        .start-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 18px 35px;
-            font-size: 1.3rem;
+        .strip {
+            position: absolute;
             border-radius: 50px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+            opacity: 0.7;
+            animation-timing-function: cubic-bezier(0.4, 0.0, 0.2, 1);
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
         }
 
-        .start-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(102, 126, 234, 0.4);
+        .strip1 {
+            width: 200px;
+            height: 8px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            top: 10%;
+            left: 5%;
+            animation: dance1 3s infinite;
         }
 
-        .keyboard.disabled {
-            pointer-events: none;
-            opacity: 0.5;
+        .strip2 {
+            width: 150px;
+            height: 12px;
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            top: 25%;
+            right: 10%;
+            animation: dance2 2.5s infinite;
+        }
+
+        .strip3 {
+            width: 300px;
+            height: 6px;
+            background: linear-gradient(45deg, #feca57, #ff9ff3);
+            top: 40%;
+            left: 15%;
+            animation: dance3 4s infinite;
+        }
+
+        .strip4 {
+            width: 180px;
+            height: 10px;
+            background: linear-gradient(45deg, #48dbfb, #0abde3);
+            top: 55%;
+            right: 20%;
+            animation: dance4 3.5s infinite;
+        }
+
+        .strip5 {
+            width: 250px;
+            height: 14px;
+            background: linear-gradient(45deg, #ff9ff3, #f368e0);
+            top: 70%;
+            left: 8%;
+            animation: dance5 2.8s infinite;
+        }
+
+        .strip6 {
+            width: 120px;
+            height: 8px;
+            background: linear-gradient(45deg, #54a0ff, #2e86de);
+            top: 15%;
+            left: 60%;
+            animation: dance6 3.2s infinite;
+        }
+
+        .strip7 {
+            width: 220px;
+            height: 16px;
+            background: linear-gradient(45deg, #5f27cd, #341f97);
+            top: 80%;
+            right: 15%;
+            animation: dance7 2.2s infinite;
+        }
+
+        .strip8 {
+            width: 160px;
+            height: 7px;
+            background: linear-gradient(45deg, #00d2d3, #54a0ff);
+            top: 35%;
+            left: 70%;
+            animation: dance8 4.5s infinite;
+        }
+
+        .strip9 {
+            width: 280px;
+            height: 11px;
+            background: linear-gradient(45deg, #ff6348, #ff4757);
+            top: 60%;
+            left: 40%;
+            animation: dance9 3.8s infinite;
+        }
+
+        .strip10 {
+            width: 140px;
+            height: 9px;
+            background: linear-gradient(45deg, #7bed9f, #70a1ff);
+            top: 5%;
+            right: 30%;
+            animation: dance10 2.7s infinite;
+        }
+
+        @keyframes dance1 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            25% { transform: translateX(80px) translateY(-30px) rotate(5deg); }
+            50% { transform: translateX(150px) translateY(20px) rotate(-3deg); }
+            75% { transform: translateX(220px) translateY(-10px) rotate(2deg); }
+            100% { transform: translateX(300px) translateY(15px) rotate(-1deg); }
+        }
+
+        @keyframes dance2 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            25% { transform: translateX(-60px) translateY(40px) rotate(-4deg); }
+            50% { transform: translateX(-120px) translateY(-25px) rotate(6deg); }
+            75% { transform: translateX(-180px) translateY(35px) rotate(-2deg); }
+            100% { transform: translateX(-240px) translateY(-15px) rotate(3deg); }
+        }
+
+        @keyframes dance3 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            20% { transform: translateX(50px) translateY(-40px) rotate(3deg); }
+            40% { transform: translateX(-30px) translateY(60px) rotate(-5deg); }
+            60% { transform: translateX(120px) translateY(-20px) rotate(4deg); }
+            80% { transform: translateX(-80px) translateY(45px) rotate(-2deg); }
+            100% { transform: translateX(40px) translateY(-30px) rotate(1deg); }
+        }
+
+        @keyframes dance4 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            33% { transform: translateX(-100px) translateY(50px) rotate(-6deg); }
+            66% { transform: translateX(80px) translateY(-35px) rotate(4deg); }
+            100% { transform: translateX(-40px) translateY(25px) rotate(-2deg); }
+        }
+
+        @keyframes dance5 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            25% { transform: translateX(70px) translateY(-50px) rotate(3deg); }
+            50% { transform: translateX(-50px) translateY(80px) rotate(-4deg); }
+            75% { transform: translateX(110px) translateY(-30px) rotate(2deg); }
+            100% { transform: translateX(-30px) translateY(40px) rotate(-1deg); }
+        }
+
+        @keyframes dance6 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            50% { transform: translateX(160px) translateY(70px) rotate(-5deg); }
+            100% { transform: translateX(-90px) translateY(-50px) rotate(3deg); }
+        }
+
+        @keyframes dance7 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            30% { transform: translateX(-120px) translateY(60px) rotate(-4deg); }
+            70% { transform: translateX(90px) translateY(-40px) rotate(5deg); }
+            100% { transform: translateX(-60px) translateY(30px) rotate(-2deg); }
+        }
+
+        @keyframes dance8 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            25% { transform: translateX(-80px) translateY(-45px) rotate(4deg); }
+            50% { transform: translateX(120px) translateY(35px) rotate(-3deg); }
+            75% { transform: translateX(-40px) translateY(-60px) rotate(2deg); }
+            100% { transform: translateX(100px) translateY(25px) rotate(-1deg); }
+        }
+
+        @keyframes dance9 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            20% { transform: translateX(60px) translateY(-70px) rotate(3deg); }
+            40% { transform: translateX(-90px) translateY(50px) rotate(-4deg); }
+            60% { transform: translateX(130px) translateY(-30px) rotate(2deg); }
+            80% { transform: translateX(-70px) translateY(65px) rotate(-3deg); }
+            100% { transform: translateX(50px) translateY(-40px) rotate(1deg); }
+        }
+
+        @keyframes dance10 {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            33% { transform: translateX(110px) translateY(-55px) rotate(-3deg); }
+            66% { transform: translateX(-80px) translateY(75px) rotate(4deg); }
+            100% { transform: translateX(140px) translateY(-25px) rotate(-2deg); }
         }
 
         @media (max-width: 768px) {
-            .game-container {
-                grid-template-columns: 1fr;
-                gap: 15px;
-                padding: 15px;
-            }
-            
-            .keyboard {
-                grid-template-columns: repeat(13, 1fr);
-                gap: 4px;
-            }
-            
-            .key {
-                padding: 8px 3px;
-                font-size: 0.9rem;
-                min-height: 35px;
-            }
-            
-            .word-display {
-                font-size: 1.8rem;
-                letter-spacing: 6px;
-            }
-
-            .welcome-title {
-                font-size: 2.2rem;
-            }
-
-            .start-btn {
-                font-size: 1.3rem;
-                padding: 15px 30px;
-            }
-
-            .timer {
-                font-size: 1rem;
+            .strip {
+                width: 80% !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Tela de Boas-vindas -->
-    <div class="welcome-screen" id="welcomeScreen">
-        <div class="welcome-content">
-            <div class="welcome-emoji">🔐</div>
-            <h1 class="welcome-title">Bem vinda, Simone</h1>
-            <p class="welcome-subtitle">Você pode descobrir o usuário e a senha através deste enigma</p>
-            <button class="start-btn" onclick="startGame()">Resolver enigma 🔍</button>
-        </div>
-    </div>
-
-    <div class="game-container" id="gameContainer" style="display: none;">
-        <div class="left-panel">
-            <div class="game-header">
-                <h1 class="game-title">🎯 Jogo da Forca</h1>
-            </div>
-            
-            <div class="hint" id="hint">Dica: usuário</div>
-            <div class="word-display" id="wordDisplay">_ _ _ _ _ _</div>
-            
-            <div class="keyboard" id="keyboard">
-                <!-- Teclado será gerado pelo JavaScript -->
-            </div>
-            
-            <div class="game-info">
-                <div class="errors" id="errors">Erros: 0/3</div>
-                <div class="timer" id="timer"></div>
-            </div>
-            
-            <div class="message" id="message"></div>
-        </div>
+    <div class="container">
+        <div class="strip strip1"></div>
+        <div class="strip strip2"></div>
+        <div class="strip strip3"></div>
+        <div class="strip strip4"></div>
+        <div class="strip strip5"></div>
+        <div class="strip strip6"></div>
+        <div class="strip strip7"></div>
+        <div class="strip strip8"></div>
+        <div class="strip strip9"></div>
+        <div class="strip strip10"></div>
         
-        <div class="hangman">
-            <svg id="hangmanSvg" viewBox="0 0 200 250">
-                <!-- Base -->
-                <rect x="10" y="230" width="100" height="10" fill="#8B4513" stroke="#654321" stroke-width="2"/>
-                <!-- Poste vertical -->
-                <rect x="30" y="20" width="8" height="220" fill="#8B4513" stroke="#654321" stroke-width="2"/>
-                <!-- Poste horizontal -->
-                <rect x="30" y="20" width="80" height="8" fill="#8B4513" stroke="#654321" stroke-width="2"/>
-                <!-- Corda -->
-                <rect x="105" y="20" width="3" height="30" fill="#D2691E" stroke="#A0522D" stroke-width="1"/>
-                
-                <!-- Partes do corpo (inicialmente invisíveis) -->
-                <!-- Cabeça -->
-                <circle id="head" cx="106" cy="65" r="15" fill="none" stroke="#333" stroke-width="3" style="display: none"/>
-                <!-- Corpo -->
-                <line id="body" x1="106" y1="80" x2="106" y2="150" stroke="#333" stroke-width="3" style="display: none"/>
-                <!-- Braço esquerdo -->
-                <line id="leftArm" x1="106" y1="100" x2="85" y2="120" stroke="#333" stroke-width="3" style="display: none"/>
-                <!-- Braço direito -->
-                <line id="rightArm" x1="106" y1="100" x2="127" y2="120" stroke="#333" stroke-width="3" style="display: none"/>
-                <!-- Perna esquerda -->
-                <line id="leftLeg" x1="106" y1="150" x2="85" y2="180" stroke="#333" stroke-width="3" style="display: none"/>
-                <!-- Perna direita -->
-                <line id="rightLeg" x1="106" y1="150" x2="127" y2="180" stroke="#333" stroke-width="3" style="display: none"/>
-            </svg>
-        </div>
+
     </div>
-
-    <script>
-        const words = [
-            { word: 'gabriel', hint: 'usuário' },
-            { word: 'jururu', hint: 'senha' }
-        ];
-
-        let currentWord = '';
-        let currentHint = '';
-        let guessedWord = [];
-        let wrongGuesses = [];
-        let gameOver = false;
-        let currentWordIndex = 0;
-        let penaltyTimer = null;
-
-        const hangmanParts = ['head', 'body', 'leftArm'];
-
-        // Carregar estado do jogo
-        function loadGameState() {
-            const saved = localStorage.getItem('hangmanGame');
-            if (saved) {
-                const state = JSON.parse(saved);
-                currentWordIndex = state.currentWordIndex || 0;
-                guessedWord = state.guessedWord || [];
-                wrongGuesses = state.wrongGuesses || [];
-                gameOver = state.gameOver || false;
-                
-                // Verificar se há penalidade ativa
-                if (state.penaltyUntil && Date.now() < state.penaltyUntil) {
-                    initializeGame();
-                    startPenaltyTimer(state.penaltyUntil);
-                    return;
-                }
-            }
-            
-            initializeGame();
-        }
-
-        // Salvar estado do jogo
-        function saveGameState() {
-            const state = {
-                currentWordIndex,
-                guessedWord,
-                wrongGuesses,
-                gameOver
-            };
-            localStorage.setItem('hangmanGame', JSON.stringify(state));
-        }
-
-        // Inicializar jogo
-        function initializeGame() {
-            const wordData = words[currentWordIndex];
-            currentWord = wordData.word;
-            currentHint = wordData.hint;
-            
-            if (guessedWord.length === 0 || guessedWord.length !== currentWord.length) {
-                guessedWord = Array(currentWord.length).fill('_');
-            }
-            
-            updateDisplay();
-            createKeyboard();
-            updateHangman();
-        }
-
-        // Criar teclado
-        function createKeyboard() {
-            const keyboard = document.getElementById('keyboard');
-            keyboard.innerHTML = '';
-            
-            const letters = 'abcdefghijklmnopqrstuvwxyz';
-            
-            for (let letter of letters) {
-                const key = document.createElement('div');
-                key.className = 'key';
-                key.textContent = letter;
-                key.onclick = () => guessLetter(letter);
-                
-                if (wrongGuesses.includes(letter)) {
-                    key.classList.add('used');
-                } else if (currentWord.includes(letter) && guessedWord.includes(letter)) {
-                    key.classList.add('correct');
-                }
-                
-                keyboard.appendChild(key);
-            }
-        }
-
-        // Adivinhar letra
-        function guessLetter(letter) {
-            if (gameOver || wrongGuesses.includes(letter) || guessedWord.includes(letter)) {
-                return;
-            }
-
-            if (currentWord.includes(letter)) {
-                // Letra correta
-                for (let i = 0; i < currentWord.length; i++) {
-                    if (currentWord[i] === letter) {
-                        guessedWord[i] = letter;
-                    }
-                }
-                
-                // Verificar vitória
-                if (!guessedWord.includes('_')) {
-                    gameOver = true;
-                    document.getElementById('message').innerHTML = '<span class="win">🎉 Parabéns! Você descobriu a palavra!</span>';
-                    
-                    // Avançar para próxima palavra após 2 segundos
-                    setTimeout(() => {
-                        if (currentWordIndex < words.length - 1) {
-                            nextWord();
-                        } else {
-                            document.getElementById('message').innerHTML = '<span class="win">🎊 Parabéns! Você descobriu tudo! Usuário: gabriel | Senha: jururu</span>';
-                        }
-                    }, 2500);
-                }
-            } else {
-                // Letra incorreta
-                wrongGuesses.push(letter);
-                updateHangman();
-                
-                // Verificar derrota
-                if (wrongGuesses.length >= 3) {
-                    gameOver = true;
-                    document.getElementById('message').innerHTML = '<span class="lose">💀 Você perdeu! Aguarde 5 minutos para tentar novamente.</span>';
-                    
-                    // Iniciar penalidade de 5 minutos
-                    const penaltyUntil = Date.now() + (5 * 60 * 1000);
-                    const state = JSON.parse(localStorage.getItem('hangmanGame') || '{}');
-                    state.penaltyUntil = penaltyUntil;
-                    localStorage.setItem('hangmanGame', JSON.stringify(state));
-                    
-                    startPenaltyTimer(penaltyUntil);
-                }
-            }
-
-            updateDisplay();
-            createKeyboard();
-            saveGameState();
-        }
-
-        // Iniciar timer de penalidade
-        function startPenaltyTimer(penaltyUntil) {
-            const timerElement = document.getElementById('timer');
-            const keyboard = document.getElementById('keyboard');
-            
-            keyboard.classList.add('disabled');
-            
-            const updateTimer = () => {
-                const remaining = penaltyUntil - Date.now();
-                
-                if (remaining <= 0) {
-                    // Penalidade terminou
-                    timerElement.textContent = '';
-                    keyboard.classList.remove('disabled');
-                    
-                    // Limpar penalidade do localStorage
-                    const state = JSON.parse(localStorage.getItem('hangmanGame') || '{}');
-                    delete state.penaltyUntil;
-                    localStorage.setItem('hangmanGame', JSON.stringify(state));
-                    
-                    document.getElementById('message').innerHTML = '<span class="penalty">⏰ Penalidade terminada! Você pode tentar novamente.</span>';
-                    
-                    // Reiniciar a palavra atual após 2 segundos
-                    setTimeout(() => {
-                        restartCurrentWord();
-                    }, 2000);
-                    
-                    if (penaltyTimer) {
-                        clearTimeout(penaltyTimer);
-                        penaltyTimer = null;
-                    }
-                    return;
-                }
-                
-                const minutes = Math.floor(remaining / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                timerElement.textContent = `⏱️ Aguarde ${minutes}:${seconds.toString().padStart(2, '0')} para tentar novamente`;
-                
-                penaltyTimer = setTimeout(updateTimer, 1000);
-            };
-            
-            updateTimer();
-        }
-
-        // Atualizar display
-        function updateDisplay() {
-            document.getElementById('hint').textContent = `Dica: ${currentHint}`;
-            document.getElementById('wordDisplay').textContent = guessedWord.join(' ');
-            document.getElementById('errors').textContent = `Erros: ${wrongGuesses.length}/3`;
-        }
-
-        // Atualizar forca
-        function updateHangman() {
-            for (let i = 0; i < wrongGuesses.length && i < hangmanParts.length; i++) {
-                document.getElementById(hangmanParts[i]).style.display = 'block';
-            }
-        }
-
-        // Próxima palavra
-        function nextWord() {
-            currentWordIndex++;
-            guessedWord = [];
-            wrongGuesses = [];
-            gameOver = false;
-            
-            // Limpar display da forca
-            hangmanParts.forEach(part => {
-                document.getElementById(part).style.display = 'none';
-            });
-            
-            document.getElementById('message').textContent = '';
-            document.getElementById('timer').textContent = '';
-            
-            // Salvar progresso
-            saveGameState();
-            
-            initializeGame();
-        }
-
-        // Reiniciar palavra atual (para usar após penalidade)
-        function restartCurrentWord() {
-            guessedWord = [];
-            wrongGuesses = [];
-            gameOver = false;
-            
-            // Limpar display da forca
-            hangmanParts.forEach(part => {
-                document.getElementById(part).style.display = 'none';
-            });
-            
-            document.getElementById('message').textContent = '';
-            document.getElementById('timer').textContent = '';
-            
-            // Salvar estado
-            saveGameState();
-            
-            initializeGame();
-        }
-
-        // Função para iniciar o jogo
-        function startGame() {
-            document.getElementById('welcomeScreen').style.display = 'none';
-            document.getElementById('gameContainer').style.display = 'grid';
-            loadGameState();
-        }
-
-        // Inicializar quando a página carregar
-        window.onload = function() {
-            // Verificar se há jogo salvo
-            const saved = localStorage.getItem('hangmanGame');
-            if (saved) {
-                const state = JSON.parse(saved);
-                // Se há jogo em andamento ou penalidade ativa, ir direto para o jogo
-                if ((state.guessedWord && state.guessedWord.length > 0) || 
-                    (state.penaltyUntil && Date.now() < state.penaltyUntil)) {
-                    startGame();
-                    return;
-                }
-            }
-            // Caso contrário, mostrar tela de boas-vindas
-        };
-    </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ec6b9cd486ae48',t:'MTc1NTEzMjIzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ef11f796591927',t:'MTc1NTE2MDAxNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
